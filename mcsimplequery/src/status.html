@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <title>Server Status</title>
+        <link rel="stylesheet" type="text/css" href="./styles.css">
+    </head>
+    <body>
+        <h1>Minecraft Server Status</h1>
+        <strong>Players online: </strong><p style="display: inline" id="player-online">Error</p>&nbsp;<p style="display: inline" id="player-text"></p>
+        <br><strong>Available players: </strong><p style="display: inline" id="player-list">Error</p>
+        <br><strong>Server ping: </strong><p style="display: inline" id="ping">Error</p> ms
+        <br><strong>Refreshes in: </strong><p style="display: inline" id="refresh-frequency">Error</p>&nbsp;<p style="display: inline" id="minute-text"></p>
+
+        <script type = "module">
+            import {playOn, playStr, minStr, playAvail, servLat, refRate} from "/serverstatus.js"
+            
+            document.getElementById("player-online").innerHTML = playOn
+            document.getElementById("player-text").innerHTML = playStr
+            document.getElementById("minute-text").innerHTML = minStr
+            document.getElementById("player-list").innerHTML = playAvail
+            document.getElementById("ping").innerHTML = servLat
+            document.getElementById("refresh-frequency").innerHTML = refRate
+        </script>
+    </body>
+</html>
