@@ -1,0 +1,20 @@
+@media (prefers-color-scheme: dark) {
+    body {
+        color: #eee;
+        background-color: #202020;
+        font-family: OpenSans;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    body {
+        color: #202;
+        background-color: #eee;
+        font-family: OpenSans;
+    }
+}
+
+@font-face {
+    font-family: OpenSans;
+    src: local("Open Sans"), local("OpenSans"), url(https://themes.googleusercontent.com/static/fonts/opensans/v6/K88pR3goAWT7BTt32Z01mz8E0i7KZn-EPnyo3HZu7kw.woff) format('woff');
+}
