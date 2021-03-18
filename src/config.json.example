@@ -2,5 +2,6 @@
     "domainAddress": "www.example.com",
     "serverPort": 25565,
     "rateRefresh": 1,
-    "outputDir": "./"
+    "outputDir": "./",
+    "enableQuery": 0
 }
