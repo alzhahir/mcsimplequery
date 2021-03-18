@@ -34,6 +34,6 @@ Just a simple Minecraft Server query website application using Python, some Java
   `outputDir` specifies where the output file `serverstatus.js` should be placed, which is used by `status.html`. Please make sure that the directory is the same as the one in `status.html` or the app will not work.
 
 ## Contact
-You can contact me through my [e-mail](mailto:megatalzhahirdaniel@gmail.com), [my website](https://www.alzhahir.com/contact) or through [Discord](https://discord.gg/wm6V3cT).
+You can contact me through my [e-mail](mailto:megatalzhahirdaniel@gmail.com), [website](https://www.alzhahir.com/contact) or through [Discord](https://discord.gg/wm6V3cT).
 
 **Thank you for using this project! If you like this project, be sure to star it!**
