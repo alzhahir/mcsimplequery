@@ -209,7 +209,7 @@ def mainfunc():
                     elif userDirChoice == 'n' or userDirChoice == 'N':
                         n == 1
                         print("WARN: Directory creation canceled! Please check your configurations and make sure that it's valid.")
-                        raise UserAborted()
+                        raise UserAborted
                     else:
                         n == 0
         except UserAborted:
