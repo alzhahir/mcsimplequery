@@ -15,6 +15,7 @@ class InitConfig:
             self.prt = self.confdict["serverPort"]
             self.freq = self.confdict["rateRefresh"]
             self.directory = self.confdict["outputDir"]
+            self.query = self.confdict["enableQuery"]
         except PermissionError:
             raise PermissionError
         except FileNotFoundError:
@@ -46,11 +47,12 @@ class DirectoryManager:
             sys.exit(1)
 
 class ConfigurationManager:
-    def __init__(self, addr, prt, freq, directory):
+    def __init__(self, addr, prt, freq, directory, query):
         self.addr = addr
         self.prt = prt
         self.freq = freq
         self.directory = directory
+        self.query = query
 
     def writeConfiguration(write):
         try:
@@ -59,7 +61,8 @@ class ConfigurationManager:
                 "domainAddress" : write.addr,
                 "serverPort" : write.prt,
                 "rateRefresh" : write.freq,
-                "outputDir" : write.directory
+                "outputDir" : write.directory,
+                "enableQuery" : write.query
             }
 
             jsonwrite = json.dumps(write.confdict, indent = 4)
@@ -88,6 +91,7 @@ class ConfigurationManager:
             load.prt = load.confdict["serverPort"]
             load.freq = load.confdict["rateRefresh"]
             load.directory = load.confdict["outputDir"]
+            load.query = load.confdict["enableQuery"]
             
             print("Successfully loaded configuration file, config.json")
         except PermissionError:
@@ -105,7 +109,8 @@ class ConfigurationManager:
                 "domainAddress" : reload.addr,
                 "serverPort" : reload.prt,
                 "rateRefresh" : reload.freq,
-                "outputDir" : reload.directory
+                "outputDir" : reload.directory,
+                "enableQuery" : reload.query
             }
 
             jsonwrite = json.dumps(reload.confdict, indent = 4)
@@ -118,6 +123,7 @@ class ConfigurationManager:
             reload.prt = reload.conffile["serverPort"]
             reload.freq = reload.conffile["rateRefresh"]
             reload.directory = reload.conffile["outputDir"]
+            reload.query = reload.conffile["enableQuery"]
             
             print("Reloading configuration succeeded!")
         except PermissionError:

@@ -15,6 +15,10 @@ class UserAborted(Exception):
     """User aborted crucial program process."""
     pass
 
+class InvalidConfiguration(Exception):
+    """Invalid configuration found."""
+    pass
+
 # print welcome message
 print("Welcome to alzhahir's simple server status query application.\n")
 
@@ -37,6 +41,30 @@ except FileNotFoundError:
     srvport = int(input("Port: "))
     print("\nSet {0} as server port.".format(srvport))
 
+    enableQueryOption = str(input("\nAlso, does the server support Querying? If you're unsure, just type 'N'. (Y/N) "))
+    if enableQueryOption == "y" or enableQueryOption == "Y":
+        print("Enabled querying.")
+        enableQuery = 1
+    elif enableQueryOption == "n" or enableQueryOption == "N":
+        print("Using alternative 'status' method instead.")
+        enableQuery = 0
+    else:
+        n = 0
+        while n == 0:
+            print("Invalid option.")
+            enableQueryOption = str(input("\nAlso, does the server support Querying? If you're unsure, just type 'N'. (Y/N) "))
+            if enableQueryOption == "y" or enableQueryOption == "Y":
+                print("Enabled querying.")
+                enableQuery = 1
+                n = 1
+            elif enableQueryOption == "n" or enableQueryOption == "N":
+                print("Using alternative 'status' method instead.")
+                enableQuery = 0
+                n = 0
+            else:
+                print("Invalid option.")
+                n = 0
+
     print("\nNext, let's set the requery frequency, in minutes.")
     refreshfreq = int(input("Refresh Frequency: "))
 
@@ -51,14 +79,7 @@ except FileNotFoundError:
     writedir = str(input("Output folder: "))
     print("\nCreating new config file...")
 
-    config_init = {
-	        "domainAddress" : webAddress,
-            "serverPort" : srvport,
-            "rateRefresh" : refreshfreq,
-            "outputDir" : writedir
-    }
-
-    config = ConfigurationManager(webAddress, srvport, refreshfreq, writedir)
+    config = ConfigurationManager(webAddress, srvport, refreshfreq, writedir, enableQuery)
 
     config.writeConfiguration()
     config.loadConfiguration()
@@ -67,7 +88,7 @@ except PermissionError:
     sys.exit(3)
 except Exception as errorInfo:
     print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(errorInfo.__class__.__name__))
-    print("Full information available below: \n")
+    print("More information available below: \n")
     logger.exception(errorInfo)
     sys.exit(1)
 
@@ -76,6 +97,7 @@ timesec = config.freq
 domainSite = config.addr
 outputDirectory = config.directory
 port = config.prt
+isQueryEnabled = config.query
 
 if timesec > 1:
     minutestr = "minutes"
@@ -116,24 +138,31 @@ def offlinerw():
         print("Done. Rechecking in {0} {1}.\n".format(timesec, minutestr))
     except Exception as errorInfo:
         print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(errorInfo.__class__.__name__))
-        print("Full information available below: \n")
+        print("More information available below: \n")
         logger.exception(errorInfo)
         sys.exit(1)
 
 # main
 def main():
     try:
-        print("\nQuerying {0} on port {1}...".format(domainSite, port))
+        print("\nLooking up {0} on port {1}...".format(domainSite, port))
         server = MinecraftServer(domainSite, port)
 
-        status = server.status()
-        query = server.query()
-
-        onlinePlayers = status.players.online
-        latency = status.latency
-        playerList = query.players.names
-        pingLatency = server.ping()
-
+        if isQueryEnabled == 1:
+            query = server.query()
+            status = server.status()
+            onlinePlayers = query.players.online
+            playerList = query.players.names
+            pingLatency = status.latency
+        elif isQueryEnabled == 0:
+            status = server.status()
+            onlinePlayers = status.players.online
+            playerList = "Not available since Query is not enabled."
+            pingLatency = status.latency
+        else:
+            print('ERROR: Invalid option "{0}" found in "enableQuery" option in config.json.'.format(isQueryEnabled))
+            raise InvalidConfiguration
+        
         isOnline = "Online"
 
         if onlinePlayers > 1:
@@ -208,14 +237,16 @@ def main():
                     else:
                         n = 0
         except UserAborted:
-            print("\nFATAL: User aborted crucial program routine. Exiting due to insufficient requirements met.")
-            sys.exit(2)
+            raise UserAborted
     except UserAborted:
         print("\nFATAL: User aborted crucial program routine. Exiting due to insufficient requirements met.")
         sys.exit(2)
+    except InvalidConfiguration:
+        print("\nFATAL: Invalid configuration.")
+        sys.exit(3)
     except Exception as errorInfo:
         print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(errorInfo.__class__.__name__))
-        print("Full information available below: \n")
+        print("More information available below: \n")
         logger.exception(errorInfo)
         sys.exit(1)
 
