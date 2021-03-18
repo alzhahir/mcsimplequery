@@ -11,6 +11,66 @@ class UserAborted(Exception):
     """User aborted crucial program process."""
     pass
 
+# load config class
+class configurationManager:
+    def __init__(self, addr, prt, freq, directory, confdict, conffile):
+        self.addr = addr
+        self.prt = prt
+        self.freq = freq
+        self.directory = directory
+        self.confdict = confdict
+        self.conffile = conffile
+
+    def writeConfiguration(write):
+        try:
+            print("Writing to configuration.")
+            write.confdict = {
+                "domainAddress" : write.addr,
+                "serverPort" : write.prt,
+                "rateRefresh" : write.freq,
+                "outputDir" : write.directory
+            }
+
+            jsonwrite = json.dumps(write.confdict, indent = 4)
+
+            with open("./config.json", "w") as conf_new:
+                conf_new.write(jsonwrite)
+            
+            print("Done writing.")
+        except Exception as err:
+            print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(err.__class__.__name__))
+            sys.exit(1)
+    
+    def loadConfiguration(load):
+        try:
+            print("Loading configuration.")
+
+            with open("./config.json") as conf_file:
+                load.confdict = json.load(conf_file)
+
+            load.addr = load.confdict["domainAddress"]
+            load.prt = load.confdict["serverPort"]
+            load.freq = load.confdict["rateRefresh"]
+            load.directory = load.confdict["outputDir"]
+            
+            print("\nSuccessfully loaded configuration file, config.json")
+        except Exception as err:
+            print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(err.__class__.__name__))
+            sys.exit(1)
+
+    def reloadConfiguration(reload):
+        print("Reloading configuration.")
+        reload.confdict = {
+            "domainAddress" : reload.addr,
+            "serverPort" : reload.prt,
+            "rateRefresh" : reload.freq,
+            "outputDir" : reload.directory
+        }
+
+        with open("./config.json") as conf_file:
+            reload.conffile = json.load(conf_file)
+
+# print welcome message
 print("Welcome to alzhahir's simple server status query application.\n")
 
 # Load config.json
@@ -44,14 +104,14 @@ except:
     print("\nNice, set the app to requery every {0} {1}.".format(refreshfreq, minstr))
 
     print("\nLet's also set the output directory for the response json and js. Please set it the same as your status.html.")
-    outputdir = str(input())
+    writedir = str(input())
     print("\nCreating new config file...")
 
     config_init = {
 	        "domainAddress" : webAddress,
             "serverPort" : srvport,
             "rateRefresh" : refreshfreq,
-            "outputDir" : outputdir
+            "outputDir" : writedir
     }
 
     config_formatted = json.dumps(config_init, indent = 4)
