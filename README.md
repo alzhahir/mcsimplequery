@@ -12,8 +12,8 @@ Just a simple Minecraft Server query website application using Python, some Java
 
 ### Installation process
 1. Install Python 3.8 or above.
-2. Install dependencies.
-3. Clone this repo.
+2. Install dependencies. Do `pip install mcstatus` and `pip install schedule`.
+3. Clone this repository. Do `git clone https://github.com/alzhahir/mcsimplequery`.
 4. Move `status.html` to the webserver HTML website directory. For example, `/var/www/html/` for most Apache webservers.
 5. You can either rename and move `config.json.example` to the same folder as `main.py` or you can also just let `main.py` to create a new `config.json` file for you.
 6. Change the `config.json` to what you need.
@@ -34,6 +34,6 @@ Just a simple Minecraft Server query website application using Python, some Java
   `outputDir` specifies where the output file `serverstatus.js` should be placed, which is used by `status.html`. Please make sure that the directory is the same as the one in `status.html` or the app will not work.
 
 ## Contact
-You can contact me through [my website](https://www.alzhahir.com/contact) or through [Discord](https://discord.gg/wm6V3cT).
+You can contact me through my [e-mail](mailto:megatalzhahirdaniel@gmail.com), [my website](https://www.alzhahir.com/contact) or through [Discord](https://discord.gg/wm6V3cT).
 
 **Thank you for using this project! If you like this project, be sure to star it!**
