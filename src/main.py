@@ -1,74 +1,19 @@
+import logging
 import sys
-import os
 import json
 from socket import gaierror, timeout
 import schedule
 import time
 from mcstatus import MinecraftServer
+from configmanager import InitConfig, ConfigurationManager, DirectoryManager
+
+logging.basicConfig(level=logging.WARNING)
+logger = logging.getLogger(__name__)
 
 # Custom defined exceptions
 class UserAborted(Exception):
     """User aborted crucial program process."""
     pass
-
-# load config class
-class configurationManager:
-    def __init__(self, addr, prt, freq, directory, confdict, conffile):
-        self.addr = addr
-        self.prt = prt
-        self.freq = freq
-        self.directory = directory
-        self.confdict = confdict
-        self.conffile = conffile
-
-    def writeConfiguration(write):
-        try:
-            print("Writing to configuration.")
-            write.confdict = {
-                "domainAddress" : write.addr,
-                "serverPort" : write.prt,
-                "rateRefresh" : write.freq,
-                "outputDir" : write.directory
-            }
-
-            jsonwrite = json.dumps(write.confdict, indent = 4)
-
-            with open("./config.json", "w") as conf_new:
-                conf_new.write(jsonwrite)
-            
-            print("Done writing.")
-        except Exception as err:
-            print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(err.__class__.__name__))
-            sys.exit(1)
-    
-    def loadConfiguration(load):
-        try:
-            print("Loading configuration.")
-
-            with open("./config.json") as conf_file:
-                load.confdict = json.load(conf_file)
-
-            load.addr = load.confdict["domainAddress"]
-            load.prt = load.confdict["serverPort"]
-            load.freq = load.confdict["rateRefresh"]
-            load.directory = load.confdict["outputDir"]
-            
-            print("\nSuccessfully loaded configuration file, config.json")
-        except Exception as err:
-            print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(err.__class__.__name__))
-            sys.exit(1)
-
-    def reloadConfiguration(reload):
-        print("Reloading configuration.")
-        reload.confdict = {
-            "domainAddress" : reload.addr,
-            "serverPort" : reload.prt,
-            "rateRefresh" : reload.freq,
-            "outputDir" : reload.directory
-        }
-
-        with open("./config.json") as conf_file:
-            reload.conffile = json.load(conf_file)
 
 # print welcome message
 print("Welcome to alzhahir's simple server status query application.\n")
@@ -76,25 +21,24 @@ print("Welcome to alzhahir's simple server status query application.\n")
 # Load config.json
 try:
     print("Loading configuration...")
-    with open("./config.json") as conf_file:
-        config = json.load(conf_file)
+    config = InitConfig()
     
     print("Successfully loaded configuration file, config.json")
-except:
-    print("ERROR: Cannot find or load config.json in program directory! Did you delete it?")
+except FileNotFoundError:
+    print("ERROR: Cannot find and load config.json in program directory! Did you delete it?")
 
     print("\nInitializing...")
 
-    print("Please enter the Minecraft address you will be using.")
-    webAddress = str(input())
+    print("Please enter the Minecraft Server address you will be using.")
+    webAddress = str(input("Address: "))
     print("\nAlright, set {0} as your domain address.".format(webAddress))
 
     print("\nNext, please enter the server port.")
-    srvport = int(input())
+    srvport = int(input("Port: "))
     print("\nSet {0} as server port.".format(srvport))
 
     print("\nNext, let's set the requery frequency, in minutes.")
-    refreshfreq = int(input())
+    refreshfreq = int(input("Refresh Frequency: "))
 
     if refreshfreq > 1:
         minstr = "minutes"
@@ -104,7 +48,7 @@ except:
     print("\nNice, set the app to requery every {0} {1}.".format(refreshfreq, minstr))
 
     print("\nLet's also set the output directory for the response json and js. Please set it the same as your status.html.")
-    writedir = str(input())
+    writedir = str(input("Output folder: "))
     print("\nCreating new config file...")
 
     config_init = {
@@ -114,47 +58,36 @@ except:
             "outputDir" : writedir
     }
 
-    config_formatted = json.dumps(config_init, indent = 4)
+    config = ConfigurationManager(webAddress, srvport, refreshfreq, writedir)
 
-    with open("./config.json", "w") as conf_new:
-        conf_new.write(config_formatted)
-    
-    print("Successfully created new configuration file. Loading file...")
+    config.writeConfiguration()
+    config.loadConfiguration()
+except PermissionError:
+    print("FATAL: Cannot read the specified directory due to missing permissions. Please restart the program with Administrator priviledges if the directory you specified is protected.")
+    sys.exit(3)
+except Exception as errorInfo:
+    print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(errorInfo.__class__.__name__))
+    print("Full information available below: \n")
+    logger.exception(errorInfo)
+    sys.exit(1)
 
-    with open("./config.json") as conf_file:
-        config = json.load(conf_file)
-    
-    print("\nSuccessfully loaded configuration file, config.json")
-
-# import config.json and assign dict objects into variables
-timesec = config['rateRefresh']
-domainSite = config['domainAddress']
-outputDirectory = config['outputDir']
-port = config['serverPort']
+# assign dict objects into variables
+timesec = config.freq
+domainSite = config.addr
+outputDirectory = config.directory
+port = config.prt
 
 if timesec > 1:
     minutestr = "minutes"
 else:
     minutestr = "minute"
 
-print("\nConfiguration set successfully.")
+print("\nConfiguration set successfully!")
+
 print("\nStarting service...")
 print("The service will refresh every {0} {1}.".format(timesec, minutestr))
-print("\nInitializing first query...")
 
-# create new dir func
-def newDir():
-    try:
-        print("\nCreating directory {0}".format(outputDirectory))
-        os.mkdir(outputDirectory)
-        print("Done!")
-        return
-    except PermissionError:
-        print("\nFATAL: Cannot write to the specified directory due to missing permissions. Please restart the program with Administrator priviledges if the directory you specified is protected.")
-        sys.exit(3)
-    except Exception as errorInfo:
-        print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(errorInfo.__class__.__name__))
-        sys.exit(1)
+print("\nInitializing first query...")
 
 # offline read/write
 def offlinerw():
@@ -182,11 +115,13 @@ def offlinerw():
         
         print("Done. Rechecking in {0} {1}.\n".format(timesec, minutestr))
     except Exception as errorInfo:
-        print("FATAL: {0} occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(errorInfo.__class__.__name__))
-        sys.exit(2)
+        print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(errorInfo.__class__.__name__))
+        print("Full information available below: \n")
+        logger.exception(errorInfo)
+        sys.exit(1)
 
 # main
-def mainfunc():
+def main():
     try:
         print("\nQuerying {0} on port {1}...".format(domainSite, port))
         server = MinecraftServer(domainSite, port)
@@ -245,13 +180,13 @@ def mainfunc():
         sys.exit(3)
     except FileNotFoundError:
         print('\nERROR: The specified directory "{0}" cannot be located. Proceeding to create a new directory in the defined location.'.format(outputDirectory))
-        print('\nATTENTION: Do you really want to create a new directory in "{0}"? (Y/N)'.format(outputDirectory))
-        userDirChoice = str(input())
+        userDirChoice = str(input('\nATTENTION: Do you really want to create a new directory in "{0}"? (Y/N) '.format(outputDirectory)))
         try:
             if userDirChoice == 'y' or userDirChoice == 'Y':
-                newDir()
+                newDir = DirectoryManager(outputDirectory)
+                newDir.createNewDir()
                 print("Re-running the program again immediately.")
-                mainfunc()
+                main()
             elif userDirChoice == 'n' or userDirChoice == 'N':
                 print("WARN: Directory creation canceled! Please check your configurations and make sure that it's valid.")
                 raise UserAborted
@@ -259,19 +194,19 @@ def mainfunc():
                 n = 0
                 while n == 0:
                     print("Invalid input!")
-                    print('\nATTENTION: Do you really want to create a new directory in "{0}"? (Y/N)'.format(outputDirectory))
-                    userDirChoice = str(input())
+                    userDirChoice = str(input('\nATTENTION: Do you really want to create a new directory in "{0}"? (Y/N) '.format(outputDirectory)))
                     if userDirChoice == 'y' or userDirChoice == 'Y':
-                        n == 1
-                        newDir()
+                        n = 1
+                        newDir = DirectoryManager(outputDirectory)
+                        newDir.createNewDir()
                         print("Re-running the program again immediately.")
-                        mainfunc()
+                        main()
                     elif userDirChoice == 'n' or userDirChoice == 'N':
-                        n == 1
+                        n = 1
                         print("WARN: Directory creation canceled! Please check your configurations and make sure that it's valid.")
                         raise UserAborted
                     else:
-                        n == 0
+                        n = 0
         except UserAborted:
             print("\nFATAL: User aborted crucial program routine. Exiting due to insufficient requirements met.")
             sys.exit(2)
@@ -280,11 +215,13 @@ def mainfunc():
         sys.exit(2)
     except Exception as errorInfo:
         print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(errorInfo.__class__.__name__))
+        print("Full information available below: \n")
+        logger.exception(errorInfo)
         sys.exit(1)
 
 # execute mainfunc() when the app first starts and then schedule repeat function calls.
-mainfunc()
-schedule.every(timesec).minutes.do(mainfunc)
+main()
+schedule.every(timesec).minutes.do(main)
 
 while True:
     schedule.run_pending()
