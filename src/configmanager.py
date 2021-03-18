@@ -15,6 +15,8 @@ class InitConfig:
             self.prt = self.confdict["serverPort"]
             self.freq = self.confdict["rateRefresh"]
             self.directory = self.confdict["outputDir"]
+        except PermissionError:
+            raise PermissionError
         except FileNotFoundError:
             raise FileNotFoundError
         except Exception as err:
@@ -66,6 +68,9 @@ class ConfigurationManager:
                 conf_new.write(jsonwrite)
             
             print("Writing to configuration succeeded!")
+        except PermissionError:
+            print("\nFATAL: Cannot write to the specified directory due to missing permissions. Please restart the program with Administrator priviledges if the directory you specified is protected.")
+            sys.exit(3)
         except Exception as err:
             print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(err.__class__.__name__))
             print("Full information available below: \n")
@@ -85,6 +90,8 @@ class ConfigurationManager:
             load.directory = load.confdict["outputDir"]
             
             print("Successfully loaded configuration file, config.json")
+        except PermissionError:
+            raise PermissionError
         except Exception as err:
             print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(err.__class__.__name__))
             print("Full information available below: \n")
@@ -113,6 +120,9 @@ class ConfigurationManager:
             reload.directory = reload.conffile["outputDir"]
             
             print("Reloading configuration succeeded!")
+        except PermissionError:
+            print("\nFATAL: Cannot read or write to the specified directory due to missing permissions. Please restart the program with Administrator priviledges if the directory you specified is protected.")
+            sys.exit(3)
         except Exception as err:
             print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(err.__class__.__name__))
             print("Full information available below: \n")
