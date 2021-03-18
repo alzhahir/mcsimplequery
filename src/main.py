@@ -184,7 +184,7 @@ def mainfunc():
         print("\nFATAL: Cannot write to the specified directory due to missing permissions. Please restart the program with Administrator priviledges if the directory you specified is protected.")
         sys.exit(3)
     except FileNotFoundError:
-        print("\nERROR: The specified directory cannot be located. Proceeding to create a new directory in the defined location.")
+        print('\nERROR: The specified directory "{0}" cannot be located. Proceeding to create a new directory in the defined location.'.format(outputDirectory))
         print('\nATTENTION: Do you really want to create a new directory in "{0}"? (Y/N)'.format(outputDirectory))
         userDirChoice = str(input())
         try:
