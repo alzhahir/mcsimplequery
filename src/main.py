@@ -27,59 +27,8 @@ try:
     config = InitConfig()
 except FileNotFoundError:
     print("ERROR: Cannot find and load config.json in program directory! Did you delete it?")
-
-    print("\nInitializing...")
-
-    print("Please enter the Minecraft Server address you will be using.")
-    webAddress = str(input("Address: "))
-    print("\nAlright, set {0} as your domain address.".format(webAddress))
-
-    print("\nNext, please enter the server port.")
-    srvport = int(input("Port: "))
-    print("\nSet {0} as server port.".format(srvport))
-
-    enableQueryOption = str(input("\nAlso, does the server support Querying? If you're unsure, just type 'N'. (Y/N) "))
-    if enableQueryOption == "y" or enableQueryOption == "Y":
-        print("Enabled querying.")
-        enableQuery = 1
-    elif enableQueryOption == "n" or enableQueryOption == "N":
-        print("Using alternative 'status' method instead.")
-        enableQuery = 0
-    else:
-        n = 0
-        while n == 0:
-            print("Invalid option.")
-            enableQueryOption = str(input("\nAlso, does the server support Querying? If you're unsure, just type 'N'. (Y/N) "))
-            if enableQueryOption == "y" or enableQueryOption == "Y":
-                print("Enabled querying.")
-                enableQuery = 1
-                n = 1
-            elif enableQueryOption == "n" or enableQueryOption == "N":
-                print("Using alternative 'status' method instead.")
-                enableQuery = 0
-                n = 0
-            else:
-                print("Invalid option.")
-                n = 0
-
-    print("\nNext, let's set the requery frequency, in minutes.")
-    refreshfreq = int(input("Refresh Frequency: "))
-
-    if refreshfreq > 1:
-        minstr = "minutes"
-    else:
-        minstr = "minute"
-    
-    print("\nNice, set the app to requery every {0} {1}.".format(refreshfreq, minstr))
-
-    print("\nLet's also set the output directory for the response json and js. Please set it the same as your status.html.")
-    writedir = str(input("Output folder: "))
-    print("\nCreating new config file...")
-
-    config = ConfigurationManager(webAddress, srvport, refreshfreq, writedir, enableQuery)
-
-    config.writeConfiguration()
-    config.loadConfiguration()
+    config = ConfigurationManager()
+    newconfig = config.createNewConfiguration()
 except PermissionError:
     print("FATAL: Cannot read the specified directory due to missing permissions. Please restart the program with Administrator priviledges if the directory you specified is protected.")
     sys.exit(3)
