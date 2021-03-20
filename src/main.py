@@ -24,10 +24,7 @@ print("Welcome to alzhahir's simple server status query application.\n")
 
 # Load config.json
 try:
-    print("Loading configuration...")
     config = InitConfig()
-    
-    print("Successfully loaded configuration file, config.json")
 except FileNotFoundError:
     print("ERROR: Cannot find and load config.json in program directory! Did you delete it?")
 

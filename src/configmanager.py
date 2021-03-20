@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 class InitConfig:
     def __init__(self) -> None:
         try:
+            print("Initializing configuration...")
             with open("./config.json") as conf_load:
                 self.confdict = json.load(conf_load)
         
@@ -16,6 +17,8 @@ class InitConfig:
             self.freq = self.confdict["rateRefresh"]
             self.directory = self.confdict["outputDir"]
             self.query = self.confdict["enableQuery"]
+
+            print("Successfully loaded configuration file, config.json.")
         except PermissionError:
             raise PermissionError
         except FileNotFoundError:
@@ -129,6 +132,15 @@ class ConfigurationManager:
         except PermissionError:
             print("\nFATAL: Cannot read or write to the specified directory due to missing permissions. Please restart the program with Administrator priviledges if the directory you specified is protected.")
             sys.exit(3)
+        except Exception as err:
+            print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(err.__class__.__name__))
+            print("Full information available below: \n")
+            logger.exception(err)
+            sys.exit(1)
+    
+    def createNewConfiguration(newconf):
+        try:
+            print("Creating new configuration...")
         except Exception as err:
             print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(err.__class__.__name__))
             print("Full information available below: \n")
