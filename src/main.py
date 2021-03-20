@@ -5,7 +5,7 @@ from socket import gaierror, timeout
 import schedule
 import time
 from mcstatus import MinecraftServer
-from configmanager import InitConfig, ConfigurationManager, DirectoryManager
+from configmanager import LoadConfig, WriteConfig, DirectoryManager
 
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
@@ -24,11 +24,24 @@ print("Welcome to alzhahir's simple server status query application.\n")
 
 # Load config.json
 try:
-    config = InitConfig()
+    print("Loading and initializing configuration...")
+    config = LoadConfig()
+
+    timesec = config.freq
+    domainSite = config.addr
+    outputDirectory = config.directory
+    port = config.prt
+    isQueryEnabled = config.query
 except FileNotFoundError:
     print("ERROR: Cannot find and load config.json in program directory! Did you delete it?")
-    config = ConfigurationManager()
-    newconfig = config.createNewConfiguration()
+    WriteConfig(True)
+    config = LoadConfig()
+
+    timesec = config.freq
+    domainSite = config.addr
+    outputDirectory = config.directory
+    port = config.prt
+    isQueryEnabled = config.query
 except PermissionError:
     print("FATAL: Cannot read the specified directory due to missing permissions. Please restart the program with Administrator priviledges if the directory you specified is protected.")
     sys.exit(3)
@@ -37,13 +50,6 @@ except Exception as errorInfo:
     print("More information available below: \n")
     logger.exception(errorInfo)
     sys.exit(1)
-
-# assign dict objects into variables
-timesec = config.freq
-domainSite = config.addr
-outputDirectory = config.directory
-port = config.prt
-isQueryEnabled = config.query
 
 if timesec > 1:
     minutestr = "minutes"
