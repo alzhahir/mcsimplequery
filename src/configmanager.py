@@ -89,6 +89,8 @@ class WriteConfig:
                 sys.exit(1)
         else:
             print("Writing into configuration...")
+            print("FATAL: Ah, this feature has not been added yet. Exiting program...")
+            sys.exit(0)
 
 class DirectoryManager:
     def __init__(self, directory):
