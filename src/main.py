@@ -60,7 +60,7 @@ except FileNotFoundError:
             elif enableQueryOption == "n" or enableQueryOption == "N":
                 print("Using alternative 'status' method instead.")
                 enableQuery = 0
-                n = 0
+                n = 1
             else:
                 print("Invalid option.")
                 n = 0
@@ -70,6 +70,21 @@ except FileNotFoundError:
 
     if refreshfreq > 1:
         minstr = "minutes"
+    elif refreshfreq < 1:
+        print("Invalid frequency")
+        n = 0
+        while n == 0:
+            print("\nPlease enter a valid frequency.")
+            refreshfreq = int(input("Refresh Frequency: "))
+            if refreshfreq < 1:
+                print("Invalid frequency")
+                n = 0
+            elif refreshfreq > 1:
+                minstr = "minutes"
+                n = 1
+            else:
+                minstr = "minute"
+                n = 1
     else:
         minstr = "minute"
     
@@ -99,15 +114,16 @@ outputDirectory = config.directory
 port = config.prt
 isQueryEnabled = config.query
 
+# reassign minute string values since it could be changed directly
 if timesec > 1:
-    minutestr = "minutes"
+    minstr = "minutes"
 else:
-    minutestr = "minute"
+    minstr = "minute"
 
 print("\nConfiguration set successfully!")
 
 print("\nStarting service...")
-print("The service will refresh every {0} {1}.".format(timesec, minutestr))
+print("The service will refresh every {0} {1}.".format(timesec, minstr))
 
 print("\nInitializing first query...")
 
@@ -133,9 +149,9 @@ def offlinerw():
         textjs = "var servHealth = '{0}'\nvar playStr = 'players'\nvar minStr = '{1}'\nvar playOn = 0\nvar playAvail = 'Offline'\nvar servLat = 0\nvar refRate = {2}\nexport {{\n\tservHealth,\n\tplayStr,\n\tminStr,\n\tplayOn,\n\tplayAvail,\n\tservLat,\n\trefRate\n}}"
 
         with open("{0}serverstatus.js".format(outputDirectory), "w") as outputfile:
-            outputfile.write(textjs.format(isOnline, minutestr, timesec))
+            outputfile.write(textjs.format(isOnline, minstr, timesec))
         
-        print("Done. Rechecking in {0} {1}.\n".format(timesec, minutestr))
+        print("Done. Rechecking in {0} {1}.\n".format(timesec, minstr))
     except Exception as errorInfo:
         print("\nFATAL: {0} exception occured. Exiting program. This might be a bug, so please create an issue if you found this.".format(errorInfo.__class__.__name__))
         print("More information available below: \n")
@@ -195,9 +211,9 @@ def main():
         textjs = "var servHealth = '{0}'\nvar playStr = '{1}'\nvar minStr = '{2}'\nvar playOn = {3}\nvar playAvail = {4}\nvar servLat = {5}\nvar refRate = {6}\nexport {{\n\tservHealth,\n\tplayStr,\n\tminStr,\n\tplayOn,\n\tplayAvail,\n\tservLat,\n\trefRate,\n}}"
 
         with open("{0}serverstatus.js".format(outputDirectory), "w") as outputfile:
-            outputfile.write(textjs.format(isOnline, playerstr, minutestr, onlinePlayers, playerList, pingLatency, timesec))
+            outputfile.write(textjs.format(isOnline, playerstr, minstr, onlinePlayers, playerList, pingLatency, timesec))
 
-        print("Done. Refresh will occur in {0} {1}.\n".format(timesec, minutestr))
+        print("Done. Refresh will occur in {0} {1}.\n".format(timesec, minstr))
     except gaierror:
         print("\nERROR: Error resolving address. Please check your network connection configuration and make sure that the address is typed correctly.")
         offlinerw()
