@@ -32,6 +32,9 @@ Just a simple Minecraft Server query website application using Python, some Java
 
 ### `outputDir`
   `outputDir` specifies where the output file `serverstatus.js` should be placed, which is used by `status.html`. Please make sure that the directory is the same as the one in `status.html` or the app will not work.
+  
+### `enableQuery`
+`enableQuery` specifies whether the program should use the query protocol via UDP or server list ping via TCP connection when checking the server status. If you are not sure, please set this to 0 to prevent the program from malfunctioning.
 
 ## Contact
 You can contact me through my [e-mail](mailto:megatalzhahirdaniel@gmail.com), [website](https://www.alzhahir.com/contact) or through [Discord](https://discord.gg/wm6V3cT).
