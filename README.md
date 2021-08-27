@@ -12,8 +12,20 @@ Just a simple Minecraft Server query website application using Python, some Java
 
 ### Installation process
 1. Install Python 3.8 or above.
-2. Install dependencies. Do `pip install mcstatus` and `pip install schedule`.
-3. Clone this repository. Do `git clone https://github.com/alzhahir/mcsimplequery`.
+```bash
+# The command below is for Ubuntu or Debian systems.
+sudo apt update && sudo apt upgrade -y && \
+sudo apt install software-properties-common && sudo add-apt-repository ppa:deadsnakes/ppa && \
+sudo apt update && sudo apt install python3.8
+```
+2. Install dependencies.
+``` bash
+pip install mcstatus && pip install schedule
+```
+3. Clone this repository.
+```bash
+git clone https://github.com/alzhahir/mcsimplequery
+```
 4. Move `status.html` to the webserver HTML website directory. For example, `/var/www/html/` for most Apache webservers.
 5. You can either rename and move `config.json.example` to the same folder as `main.py` or you can also just let `main.py` to create a new `config.json` file for you.
 6. Change the `config.json` to what you need.
